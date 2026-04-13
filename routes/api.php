@@ -23,9 +23,15 @@ use App\Http\Controllers\Api\PengajaranGuruController;
 use App\Http\Controllers\Api\TahunAjaranController;
 use App\Http\Controllers\Api\SemesterController;
 use App\Http\Controllers\Api\ImportController;
+use App\Http\Controllers\Api\EkstrakurikulerController;
+use App\Http\Controllers\Api\PpdbController;
 
 // Auth Routes
 Route::post('/login', [AuthController::class, 'login']);
+
+// Public PPDB Routes (no auth required)
+Route::post('/ppdb/register', [PpdbController::class, 'store']);
+Route::post('/ppdb/cek-status', [PpdbController::class, 'checkStatus']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -52,4 +58,43 @@ Route::middleware('auth:sanctum')->group(function () {
     // CSV Import
     Route::post('import/siswa', [ImportController::class, 'importSiswa']);
     Route::post('import/guru', [ImportController::class, 'importGuru']);
+
+    // PPDB Admin
+    Route::get('ppdb', [PpdbController::class, 'index']);
+    Route::put('ppdb/{id}/status', [PpdbController::class, 'updateStatus']);
+    Route::post('ppdb/terima-siswa', [PpdbController::class, 'terimaSiswa']);
+
+    // Ekstrakurikuler
+    Route::get('ekstrakurikuler', [EkstrakurikulerController::class, 'getEkskul']);
+    Route::post('ekstrakurikuler', [EkstrakurikulerController::class, 'storeEkskul']);
+
+    // Anggota Ekskul
+    Route::get('ekstrakurikuler-anggota', [EkstrakurikulerController::class, 'getAnggota']);
+    Route::post('ekstrakurikuler-anggota', [EkstrakurikulerController::class, 'storeAnggota']);
+
+    // Absensi Ekskul
+    Route::get('ekstrakurikuler-absensi', [EkstrakurikulerController::class, 'getAbsensi']);
+    Route::post('ekstrakurikuler-absensi', [EkstrakurikulerController::class, 'saveAbsensi']);
+
+    // Users with role guru or pelatih (for ekskul coach dropdown)
+    Route::get('users-guru', function () {
+        return \App\Models\User::whereIn('role', ['guru', 'pelatih'])->select('id', 'nama', 'email', 'role')->get();
+    });
+
+    // Quick create pelatih eksternal
+    Route::post('pelatih', function (Request $request) {
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'username' => 'required|string|unique:users,username',
+        ]);
+        
+        $user = \App\Models\User::create([
+            'nama' => $validated['nama'],
+            'username' => $validated['username'],
+            'email' => $validated['username'] . '@madrasah.id',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'role' => 'pelatih',
+        ]);
+        return response()->json($user, 201);
+    });
 });
