@@ -123,4 +123,14 @@ class EkstrakurikulerController extends Controller
             'message' => 'Presensi berhasil disimpan'
         ]);
     }
+    public function destroyAnggota($id)
+    {
+        $anggota = EkstrakurikulerAnggota::findOrFail($id);
+        $anggota->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Siswa berhasil dihapus dari ekstrakurikuler'
+        ]);
+    }
 }

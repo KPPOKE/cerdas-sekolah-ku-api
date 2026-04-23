@@ -14,12 +14,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Schema::disableForeignKeyConstraints();
         User::truncate();
         Guru::truncate();
         TahunAjaran::truncate();
@@ -28,7 +29,7 @@ class DatabaseSeeder extends Seeder
         Kelas::truncate();
         Siswa::truncate();
         PengajaranGuru::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        Schema::enableForeignKeyConstraints();
 
         // --- UUID Maps ---
         $usersMap = [
