@@ -67,6 +67,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ekstrakurikuler
     Route::get('ekstrakurikuler', [EkstrakurikulerController::class, 'getEkskul']);
     Route::post('ekstrakurikuler', [EkstrakurikulerController::class, 'storeEkskul']);
+    Route::put('ekstrakurikuler/{id}', [EkstrakurikulerController::class, 'updateEkskul']);
+    Route::delete('ekstrakurikuler/{id}', [EkstrakurikulerController::class, 'destroyEkskul']);
 
     // Anggota Ekskul
     Route::get('ekstrakurikuler-anggota', [EkstrakurikulerController::class, 'getAnggota']);

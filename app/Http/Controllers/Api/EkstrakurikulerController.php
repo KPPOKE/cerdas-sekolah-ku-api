@@ -45,6 +45,45 @@ class EkstrakurikulerController extends Controller
         ], 201);
     }
 
+    public function updateEkskul(Request $request, $id)
+    {
+        $request->validate([
+            'nama' => 'required|string',
+            'hari' => 'required|string',
+            'guru_id' => 'required|exists:users,id'
+        ]);
+
+        $ekskul = Ekstrakurikuler::findOrFail($id);
+        $ekskul->update($request->all());
+        $ekskul->load('guru');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ekstrakurikuler berhasil diperbarui',
+            'data' => $ekskul
+        ]);
+    }
+
+    public function destroyEkskul($id)
+    {
+        $ekskul = Ekstrakurikuler::findOrFail($id);
+        
+        // Check if has members
+        if ($ekskul->anggotas()->count() > 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak dapat menghapus ekstrakurikuler yang masih memiliki anggota'
+            ], 400);
+        }
+
+        $ekskul->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ekstrakurikuler berhasil dihapus'
+        ]);
+    }
+
     // === ANGGOTA EKSKUL ===
     public function getAnggota(Request $request)
     {
