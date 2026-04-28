@@ -46,6 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('tahun-ajaran', TahunAjaranController::class);
     Route::apiResource('pengajaran', PengajaranGuruController::class);
 
+    // Nilai
+    Route::get('nilai', [\App\Http\Controllers\Api\NilaiController::class, 'index']);
+    Route::post('nilai/batch', [\App\Http\Controllers\Api\NilaiController::class, 'batchSave']);
+
     // Custom route to toggle active tahun ajaran
     Route::put('tahun-ajaran/{id}/toggle-aktif', [TahunAjaranController::class, 'toggleAktif']);
 
