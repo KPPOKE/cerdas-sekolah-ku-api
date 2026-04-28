@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PpdbPendaftarResource;
 use Illuminate\Http\Request;
 use App\Models\PpdbPendaftar;
 use App\Models\Siswa;
-use Illuminate\Support\Str;
 
 class PpdbController extends Controller
 {
     public function index()
     {
         $pendaftars = PpdbPendaftar::orderBy('created_at', 'desc')->get();
-        return response()->json($pendaftars);
+        return PpdbPendaftarResource::collection($pendaftars);
     }
 
     public function store(Request $request)
@@ -53,7 +53,7 @@ class PpdbController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Pendaftaran berhasil dikirim',
-            'data' => $pendaftar
+            'data' => new PpdbPendaftarResource($pendaftar)
         ], 201);
     }
 
@@ -74,7 +74,7 @@ class PpdbController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $pendaftar
+            'data' => new PpdbPendaftarResource($pendaftar)
         ]);
     }
 
@@ -91,7 +91,7 @@ class PpdbController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Status pendaftar berhasil diupdate',
-            'data' => $pendaftar
+            'data' => new PpdbPendaftarResource($pendaftar)
         ]);
     }
 
@@ -111,13 +111,19 @@ class PpdbController extends Controller
         $pendaftar->status = 'diterima';
         $pendaftar->save();
 
+        $jenisKelamin = match ($pendaftar->jenis_kelamin) {
+            'L' => 'Laki-laki',
+            'P' => 'Perempuan',
+            default => $pendaftar->jenis_kelamin,
+        };
+
         $siswa = Siswa::create([
             'nama_lengkap' => $pendaftar->nama_lengkap,
             'nik' => $pendaftar->nik,
             'nisn' => str_pad(rand(1, 999999999), 10, '0', STR_PAD_LEFT), // mock NISN since not in form
             'tempat_lahir' => $pendaftar->tempat_lahir,
             'tanggal_lahir' => $pendaftar->tanggal_lahir,
-            'jenis_kelamin' => $pendaftar->jenis_kelamin,
+            'jenis_kelamin' => $jenisKelamin,
             'alamat' => $pendaftar->alamat,
             'no_telepon' => $pendaftar->no_wa,
             'nama_ayah_kandung' => $pendaftar->nama_ayah,

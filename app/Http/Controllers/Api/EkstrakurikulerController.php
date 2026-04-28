@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EkstrakurikulerAbsensiResource;
+use App\Http\Resources\EkstrakurikulerAnggotaResource;
+use App\Http\Resources\EkstrakurikulerResource;
 use Illuminate\Http\Request;
 use App\Models\Ekstrakurikuler;
 use App\Models\EkstrakurikulerAnggota;
 use App\Models\EkstrakurikulerAbsensi;
-use Illuminate\Support\Facades\Auth;
 
 class EkstrakurikulerController extends Controller
 {
@@ -22,7 +24,7 @@ class EkstrakurikulerController extends Controller
         }
 
         $ekskul = $query->get();
-        return response()->json($ekskul);
+        return EkstrakurikulerResource::collection($ekskul);
     }
 
     public function storeEkskul(Request $request)
@@ -41,7 +43,7 @@ class EkstrakurikulerController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Ekstrakurikuler berhasil ditambahkan',
-            'data' => $ekskul
+            'data' => new EkstrakurikulerResource($ekskul)
         ], 201);
     }
 
@@ -60,7 +62,7 @@ class EkstrakurikulerController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Ekstrakurikuler berhasil diperbarui',
-            'data' => $ekskul
+            'data' => new EkstrakurikulerResource($ekskul)
         ]);
     }
 
@@ -93,7 +95,7 @@ class EkstrakurikulerController extends Controller
             $query->where('ekstrakurikuler_id', $request->ekstrakurikuler_id);
         }
 
-        return response()->json($query->get());
+        return EkstrakurikulerAnggotaResource::collection($query->get());
     }
 
     public function storeAnggota(Request $request)
@@ -118,7 +120,7 @@ class EkstrakurikulerController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Siswa berhasil ditambahkan',
-            'data' => $anggota
+            'data' => new EkstrakurikulerAnggotaResource($anggota)
         ]);
     }
 
@@ -134,7 +136,7 @@ class EkstrakurikulerController extends Controller
             $query->where('tanggal', $request->tanggal);
         }
 
-        return response()->json($query->get());
+        return EkstrakurikulerAbsensiResource::collection($query->get());
     }
 
     public function saveAbsensi(Request $request)
@@ -159,7 +161,13 @@ class EkstrakurikulerController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Presensi berhasil disimpan'
+            'message' => 'Presensi berhasil disimpan',
+            'data' => EkstrakurikulerAbsensiResource::collection(
+                EkstrakurikulerAbsensi::with('siswa')
+                    ->where('ekstrakurikuler_id', $request->ekstrakurikuler_id)
+                    ->where('tanggal', $request->tanggal)
+                    ->get()
+            ),
         ]);
     }
     public function destroyAnggota($id)

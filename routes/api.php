@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\SemesterController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\EkstrakurikulerController;
 use App\Http\Controllers\Api\PpdbController;
+use App\Http\Controllers\Api\AbsensiController;
 
 // Auth Routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -49,6 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Nilai
     Route::get('nilai', [\App\Http\Controllers\Api\NilaiController::class, 'index']);
     Route::post('nilai/batch', [\App\Http\Controllers\Api\NilaiController::class, 'batchSave']);
+
+    // Absensi
+    Route::get('absensi', [AbsensiController::class, 'index']);
+    Route::post('absensi/batch', [AbsensiController::class, 'batchSave']);
 
     // Custom route to toggle active tahun ajaran
     Route::put('tahun-ajaran/{id}/toggle-aktif', [TahunAjaranController::class, 'toggleAktif']);
