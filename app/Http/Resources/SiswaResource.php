@@ -28,6 +28,7 @@ class SiswaResource extends JsonResource
             'namaAyahKandung' => $this->nama_ayah_kandung,
             'namaIbuKandung' => $this->nama_ibu_kandung,
             'namaWali' => $this->nama_wali,
+            'foto' => $this->foto ? \Illuminate\Support\Facades\Storage::url($this->foto) : null,
         ];
     }
 }

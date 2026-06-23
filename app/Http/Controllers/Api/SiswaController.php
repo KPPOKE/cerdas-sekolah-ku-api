@@ -39,6 +39,7 @@ class SiswaController extends Controller
             'namaAyahKandung' => 'nullable|string|max:255',
             'namaIbuKandung' => 'nullable|string|max:255',
             'namaWali' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $mapping = $this->camelToSnakeMapping();
@@ -47,6 +48,10 @@ class SiswaController extends Controller
             if (array_key_exists($camel, $validated)) {
                 $data[$snake] = $validated[$camel];
             }
+        }
+
+        if ($request->hasFile('foto')) {
+            $data['foto'] = $request->file('foto')->store('siswa/foto', 'public');
         }
 
         $siswa = Siswa::create($data);
@@ -76,6 +81,7 @@ class SiswaController extends Controller
             'namaAyahKandung' => 'nullable|string|max:255',
             'namaIbuKandung' => 'nullable|string|max:255',
             'namaWali' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $mapping = $this->camelToSnakeMapping();
@@ -84,6 +90,13 @@ class SiswaController extends Controller
             if (array_key_exists($camel, $validated)) {
                 $data[$snake] = $validated[$camel];
             }
+        }
+
+        if ($request->hasFile('foto')) {
+            if ($siswa->foto) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($siswa->foto);
+            }
+            $data['foto'] = $request->file('foto')->store('siswa/foto', 'public');
         }
 
         $siswa->update($data);

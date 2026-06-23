@@ -28,6 +28,7 @@ class Siswa extends Model
         'nama_ayah_kandung',
         'nama_ibu_kandung',
         'nama_wali',
+        'foto',
     ];
 
     public function kelas()
